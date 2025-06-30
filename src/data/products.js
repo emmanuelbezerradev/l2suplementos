@@ -1,0 +1,202 @@
+export const products = [
+    {
+        id: 1,
+        name: "Whey Protein Concentrado 900g - Chocolate",
+        brand: "L2 Nutrition",
+        category: "proteinas",
+        price: 89.90,
+        originalPrice: 119.90,
+        rating: 4.8,
+        reviews: 245,
+        image: "https://via.placeholder.com/300x300/f0f2f5/2196F3?text=Whey+Protein",
+        isFavorite: false,
+        isNew: false,
+        freeShipping: true,
+        installments: 3,
+        description: "Proteína de alta qualidade para o ganho de massa muscular",
+        features: ["25g de proteína por dose", "Baixo teor de carboidratos", "Sabor chocolate cremoso"],
+        stock: 50
+    },
+    {
+        id: 2,
+        name: "Creatina Monohidratada 300g - Sem Sabor",
+        brand: "L2 Power",
+        category: "creatina",
+        price: 45.90,
+        originalPrice: 59.90,
+        rating: 4.9,
+        reviews: 189,
+        image: "https://via.placeholder.com/300x300/f0f2f5/27ae60?text=Creatina",
+        isFavorite: true,
+        isNew: false,
+        freeShipping: false,
+        installments: 2,
+        description: "Creatina pura para aumento de força e resistência",
+        features: ["100% pura", "Melhora performance", "Sem aditivos"],
+        stock: 35
+    },
+    {
+        id: 3,
+        name: "Pré-Treino Extreme 300g - Frutas Vermelhas",
+        brand: "L2 Energy",
+        category: "pre-treino",
+        price: 79.90,
+        originalPrice: null,
+        rating: 4.7,
+        reviews: 156,
+        image: "https://via.placeholder.com/300x300/f0f2f5/e74c3c?text=Pre+Treino",
+        isFavorite: false,
+        isNew: true,
+        freeShipping: true,
+        installments: 3,
+        description: "Energia e foco máximo para seus treinos",
+        features: ["200mg de cafeína", "Beta-alanina", "Citrulina malato"],
+        stock: 28
+    },
+    {
+        id: 4,
+        name: "BCAA 2:1:1 120 Cápsulas",
+        brand: "L2 Recovery",
+        category: "amino",
+        price: 39.90,
+        originalPrice: 49.90,
+        rating: 4.6,
+        reviews: 98,
+        image: "https://via.placeholder.com/300x300/f0f2f5/666?text=Produto",
+        isFavorite: false,
+        isNew: false,
+        freeShipping: false,
+        installments: 2,
+        description: "Aminoácidos essenciais para recuperação muscular",
+        features: ["Proporção 2:1:1", "120 cápsulas", "Fácil absorção"],
+        stock: 42
+    },
+    {
+        id: 5,
+        name: "Whey Protein Isolado 900g - Baunilha",
+        brand: "L2 Premium",
+        category: "proteinas",
+        price: 149.90,
+        originalPrice: 189.90,
+        rating: 4.9,
+        reviews: 312,
+        image: "https://via.placeholder.com/300x300/f0f2f5/666?text=Produto",
+        isFavorite: true,
+        isNew: false,
+        freeShipping: true,
+        installments: 6,
+        description: "Proteína isolada de máxima pureza",
+        features: ["Proteína isolada", "Zero lactose", "Absorção rápida"],
+        stock: 22
+    },
+    {
+        id: 6,
+        name: "Multivitamínico Completo 60 Cápsulas",
+        brand: "L2 Health",
+        category: "vitaminas",
+        price: 29.90,
+        originalPrice: null,
+        rating: 4.5,
+        reviews: 76,
+        image: "https://via.placeholder.com/300x300/f0f2f5/666?text=Produto",
+        isFavorite: false,
+        isNew: false,
+        freeShipping: false,
+        installments: 1,
+        description: "Vitaminas e minerais essenciais",
+        features: ["26 vitaminas e minerais", "Dose diária", "Qualidade farmacêutica"],
+        stock: 65
+    },
+    {
+        id: 7,
+        name: "Queimador de Gordura Thermo 60 Caps",
+        brand: "L2 Burn",
+        category: "queimadores",
+        price: 69.90,
+        originalPrice: 89.90,
+        rating: 4.4,
+        reviews: 134,
+        image: "https://via.placeholder.com/300x300/f0f2f5/666?text=Produto",
+        isFavorite: false,
+        isNew: true,
+        freeShipping: true,
+        installments: 3,
+        description: "Acelerador metabólico natural",
+        features: ["Termogênico natural", "Acelera metabolismo", "Sem estimulantes"],
+        stock: 18
+    },
+    {
+        id: 8,
+        name: "Mass Gainer 3kg - Chocolate",
+        brand: "L2 Mass",
+        category: "massa-muscular",
+        price: 129.90,
+        originalPrice: 159.90,
+        rating: 4.6,
+        reviews: 87,
+        image: "https://via.placeholder.com/300x300/f0f2f5/666?text=Produto",
+        isFavorite: false,
+        isNew: false,
+        freeShipping: true,
+        installments: 5,
+        description: "Ganho de peso e massa muscular",
+        features: ["50g de proteína", "Carboidratos complexos", "Vitaminas e minerais"],
+        stock: 15
+    }
+];
+
+export const categories = [
+    {
+        id: "proteinas",
+        name: "Proteínas",
+        description: "Whey, Caseína, Albumina e mais",
+        image: "/api/placeholder/200/200",
+        productCount: 45
+    },
+    {
+        id: "creatina",
+        name: "Creatina",
+        description: "Aumento de força e massa muscular",
+        image: "/api/placeholder/200/200",
+        productCount: 12
+    },
+    {
+        id: "pre-treino",
+        name: "Pré-Treino",
+        description: "Energia e foco para treinos intensos",
+        image: "/api/placeholder/200/200",
+        productCount: 23
+    },
+    {
+        id: "amino",
+        name: "Aminoácidos",
+        description: "BCAA, Glutamina e mais",
+        image: "/api/placeholder/200/200",
+        productCount: 18
+    },
+    {
+        id: "vitaminas",
+        name: "Vitaminas",
+        description: "Suporte nutricional completo",
+        image: "/api/placeholder/200/200",
+        productCount: 32
+    },
+    {
+        id: "queimadores",
+        name: "Queimadores",
+        description: "Acelere seu metabolismo",
+        image: "/api/placeholder/200/200",
+        productCount: 15
+    },
+    {
+        id: "massa-muscular",
+        name: "Massa Muscular",
+        description: "Hipercalóricos e Mass Gainers",
+        image: "/api/placeholder/200/200",
+        productCount: 8
+    }
+];
+
+export const featuredProducts = products.filter(p => p.rating >= 4.8);
+export const newProducts = products.filter(p => p.isNew);
+export const discountProducts = products.filter(p => p.originalPrice && p.originalPrice > p.price);
