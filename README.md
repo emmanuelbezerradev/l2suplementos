@@ -1,6 +1,6 @@
 # L2 Suplementos - E-commerce de Suplementos
 
-![L2 Suplementos Logo](./src/assets/logo.png)
+![L2 Suplementos Logo](./src/assets/logol2.jpeg)
 
 ## 📋 Sobre o Projeto
 
