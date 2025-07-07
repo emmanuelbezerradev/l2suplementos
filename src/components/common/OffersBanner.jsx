@@ -30,13 +30,16 @@ const OffersBanner = () => {
   ];
 
   return (
-    <section className="py-12 bg-gray-50">
-      <div className="container-custom">
+    <section className="py-12 bg-gray-50" style={{ zIndex: 5, position: 'relative' }}>
+      <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {offers.map((offer, index) => (
             <div
               key={index}
-              className={`${offer.bgColor} ${offer.textColor} p-6 rounded-2xl relative overflow-hidden group cursor-pointer transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-2xl`}
+              className={`${offer.bgColor} ${offer.textColor} p-6 rounded-2xl relative overflow-hidden group cursor-pointer transform hover:scale-105 transition-all duration-500 shadow-lg hover:shadow-2xl hover:rotate-1 hover:skew-y-1`}
+              style={{
+                animation: `slideInUp 0.8s ease-out ${index * 0.2}s both`,
+              }}
             >
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-4">
@@ -49,14 +52,15 @@ const OffersBanner = () => {
                 <h3 className="text-lg font-bold mb-2">{offer.title}</h3>
                 <p className="text-sm opacity-90">{offer.description}</p>
 
-                <button className="mt-4 bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg text-sm font-semibold transition-all">
+                <button className="mt-4 bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 transform hover:scale-110 hover:shadow-lg">
                   ATIVAR OFERTA
                 </button>
               </div>
 
-              {/* Efeito visual */}
-              <div className="absolute -top-10 -right-10 w-24 h-24 bg-white bg-opacity-10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
-              <div className="absolute -bottom-10 -left-10 w-20 h-20 bg-white bg-opacity-10 rounded-full group-hover:scale-125 transition-transform duration-500"></div>
+              {/* Efeitos visuais aprimorados */}
+              <div className="absolute -top-10 -right-10 w-24 h-24 bg-white bg-opacity-10 rounded-full group-hover:scale-150 transition-transform duration-700 animate-pulse"></div>
+              <div className="absolute -bottom-10 -left-10 w-20 h-20 bg-white bg-opacity-10 rounded-full group-hover:scale-125 transition-transform duration-700 animate-bounce"></div>
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-white bg-opacity-5 rounded-full group-hover:scale-200 transition-transform duration-1000"></div>
             </div>
           ))}
         </div>

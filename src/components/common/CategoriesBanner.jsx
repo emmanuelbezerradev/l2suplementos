@@ -5,29 +5,28 @@ const CategoriesBanner = () => {
   const categories = [
     {
       name: "Proteínas",
-      image: "https://via.placeholder.com/300x200/3B82F6/FFFFFF?text=PROTEINAS",
+      image: "/src/assets/integral capa.png",
       description: "Whey, Caseína, Albumina",
       products: "50+ produtos",
       color: "from-blue-500 to-blue-600",
     },
     {
       name: "Pré-Treino",
-      image:
-        "https://via.placeholder.com/300x200/EF4444/FFFFFF?text=PRE-TREINO",
+      image: "/src/assets/black-skull.webp",
       description: "Energia e foco máximo",
       products: "25+ produtos",
       color: "from-red-500 to-red-600",
     },
     {
       name: "Creatina",
-      image: "https://via.placeholder.com/300x200/10B981/FFFFFF?text=CREATINA",
+      image: "/src/assets/creatina.webp",
       description: "Força e resistência",
       products: "15+ produtos",
       color: "from-green-500 to-green-600",
     },
     {
       name: "Vitaminas",
-      image: "https://via.placeholder.com/300x200/F59E0B/FFFFFF?text=VITAMINAS",
+      image: "/src/assets/probiotica.webp",
       description: "Saúde e bem-estar",
       products: "30+ produtos",
       color: "from-yellow-500 to-orange-500",
@@ -35,8 +34,8 @@ const CategoriesBanner = () => {
   ];
 
   return (
-    <section className="py-16 bg-white">
-      <div className="container-custom">
+    <section className="py-16 bg-white" style={{ zIndex: 5, position: 'relative' }}>
+      <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
             Encontre o que você precisa
@@ -51,19 +50,25 @@ const CategoriesBanner = () => {
           {categories.map((category, index) => (
             <div
               key={index}
-              className="group cursor-pointer transform hover:scale-105 transition-all duration-300"
+              className="group cursor-pointer transform hover:scale-105 transition-all duration-500 hover:rotate-1 hover:skew-y-1"
+              style={{
+                animation: `slideInUp 0.8s ease-out ${index * 0.15}s both`,
+              }}
             >
-              <div className="relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-shadow">
+              <div className="relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 animate-glow">
                 {/* Imagem com overlay */}
                 <div className="relative h-48 overflow-hidden">
                   <img
                     src={category.image}
                     alt={category.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 filter group-hover:brightness-110"
                   />
                   <div
-                    className={`absolute inset-0 bg-gradient-to-t ${category.color} opacity-80 group-hover:opacity-70 transition-opacity`}
+                    className={`absolute inset-0 bg-gradient-to-t ${category.color} opacity-80 group-hover:opacity-60 transition-all duration-500`}
                   ></div>
+
+                  {/* Efeito de brilho */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-shimmer"></div>
 
                   {/* Conteúdo sobre a imagem */}
                   <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">

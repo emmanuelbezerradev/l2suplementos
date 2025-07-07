@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import logoImage from "../../assets/logol2.jpeg";
 
 const Logo = ({ className = "", size = "md" }) => {
@@ -10,13 +11,13 @@ const Logo = ({ className = "", size = "md" }) => {
   };
 
   return (
-    <div className={`${sizeClasses[size]} ${className} flex items-center`}>
+    <Link to="/" className={`${sizeClasses[size]} ${className} flex items-center hover:opacity-80 transition-opacity duration-200`}>
       <img
         src={logoImage}
         alt="L2 Suplementos"
         className="w-full h-full object-contain rounded-lg"
       />
-    </div>
+    </Link>
   );
 };
 

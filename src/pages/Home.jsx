@@ -14,10 +14,9 @@ import PromoBanner from "../components/common/PromoBanner";
 import HeroBanner from "../components/common/HeroBanner";
 import OffersBanner from "../components/common/OffersBanner";
 import CategoriesBanner from "../components/common/CategoriesBanner";
+import BackendProducts from "../components/BackendProducts";
 import {
   featuredProducts,
-  newProducts,
-  discountProducts,
   categories,
 } from "../data/products";
 import { useCart } from "../contexts/CartContext";
@@ -66,7 +65,7 @@ const Home = () => {
       {/* Banner de Promoção no Topo */}
       <PromoBanner />
 
-      {/* Hero Section Novo */}
+      {/* Hero Section com Carrossel */}
       <HeroBanner />
 
       {/* Ofertas Especiais */}
@@ -74,6 +73,9 @@ const Home = () => {
 
       {/* Categorias em Destaque */}
       <CategoriesBanner />
+
+      {/* Produtos do Backend */}
+      <BackendProducts />
 
       {/* Benefícios */}
       <section className="py-16 bg-white">
