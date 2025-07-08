@@ -14,15 +14,21 @@ import PromoBanner from "../components/common/PromoBanner";
 import HeroBanner from "../components/common/HeroBanner";
 import OffersBanner from "../components/common/OffersBanner";
 import CategoriesBanner from "../components/common/CategoriesBanner";
-import BackendProducts from "../components/BackendProducts";
-import {
-  featuredProducts,
-  categories,
-} from "../data/products";
+import BackendTest from "../components/BackendTest";
+import { useProducts } from "../hooks/useProducts";
+import { categories } from "../data/products";
 import { useCart } from "../contexts/CartContext";
 
 const Home = () => {
   const { addToCart } = useCart();
+  const { products, loading, error } = useProducts();
+
+  // Filtrar produtos do backend - garantir que products seja sempre um array
+  const productsArray = Array.isArray(products) ? products : [];
+  const featuredProducts = productsArray.filter(p => p.rating >= 4.8);
+  
+  // Se não houver produtos com rating alto, mostrar todos os produtos ou os primeiros 4
+  const displayProducts = featuredProducts.length > 0 ? featuredProducts : productsArray.slice(0, 4);
 
   const handleAddToCart = (product) => {
     addToCart(product);
@@ -62,10 +68,13 @@ const Home = () => {
 
   return (
     <div className="min-h-screen">
+      {/* Componente de Teste do Backend */}
+      <BackendTest />
+
       {/* Banner de Promoção no Topo */}
       <PromoBanner />
 
-      {/* Hero Section com Carrossel */}
+      {/* Hero Section Novo */}
       <HeroBanner />
 
       {/* Ofertas Especiais */}
@@ -73,9 +82,6 @@ const Home = () => {
 
       {/* Categorias em Destaque */}
       <CategoriesBanner />
-
-      {/* Produtos do Backend */}
-      <BackendProducts />
 
       {/* Benefícios */}
       <section className="py-16 bg-white">
@@ -154,24 +160,36 @@ const Home = () => {
           </div>
 
           {/* Grid de produtos */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-            {featuredProducts.map((product, index) => (
-              <div
-                key={product.id}
-                className="group transform hover:scale-105 transition-all duration-300"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <ProductCard
-                  product={product}
-                  onAddToCart={() => handleAddToCart(product)}
-                  onQuickView={() => console.log("Quick view:", product)}
-                  onToggleFavorite={() =>
-                    console.log("Toggle favorite:", product.id)
-                  }
-                />
-              </div>
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex justify-center items-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              <span className="ml-3 text-gray-600">Carregando produtos...</span>
+            </div>
+          ) : error ? (
+            <div className="text-center py-20">
+              <p className="text-red-600 mb-4">Erro ao carregar produtos: {error}</p>
+              <p className="text-gray-600">Verifique se o backend está rodando na porta 5001</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+              {displayProducts.map((product, index) => (
+                <div
+                  key={product.id}
+                  className="group transform hover:scale-105 transition-all duration-300"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  <ProductCard
+                    product={product}
+                    onAddToCart={() => handleAddToCart(product)}
+                    onQuickView={() => console.log("Quick view:", product)}
+                    onToggleFavorite={() =>
+                      console.log("Toggle favorite:", product.id)
+                    }
+                  />
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Call to action */}
           <div className="text-center">

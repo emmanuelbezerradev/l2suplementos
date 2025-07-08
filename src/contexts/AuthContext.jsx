@@ -1,99 +1,102 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import apiService from '../services/api';
+import React, { useState, useEffect } from 'react';
+import { AuthContext } from './AuthContextDefinition';
+import SessionManager from '../utils/sessionManager';
 
-const AuthContext = createContext();
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
+// Usuários pré-definidos (em produção, isso viria do backend)
+const PREDEFINED_USERS = [
+  {
+    id: 1,
+    email: 'admin',
+    password: 'luna1992_',
+    name: 'Administrador L2',
+    role: 'admin'
+  },
+  {
+    id: 2,
+    email: 'user@teste.com',
+    password: '123456',
+    name: 'Usuário Teste',
+    role: 'user'
   }
-  return context;
-};
+];
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(false);
 
+  // Verificar se há usuário logado no localStorage ao inicializar
   useEffect(() => {
-    checkAuthStatus();
+    const savedUser = SessionManager.loadSession();
+    console.log('AuthContext: Verificando usuário salvo:', savedUser);
+    if (savedUser) {
+      console.log('AuthContext: Usuário carregado:', savedUser);
+      setUser(savedUser);
+    }
   }, []);
 
-  const checkAuthStatus = () => {
+  // Monitorar mudanças na sessão
+  useEffect(() => {
+    const cleanup = SessionManager.watchSession((currentUser) => {
+      if (currentUser && !user) {
+        console.log('AuthContext: Sessão restaurada:', currentUser);
+        setUser(currentUser);
+      } else if (!currentUser && user) {
+        console.log('AuthContext: Sessão perdida, fazendo logout');
+        setUser(null);
+      }
+    });
+
+    return cleanup;
+  }, [user]);
+
+  const login = async (email, password) => {
+    setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const userData = localStorage.getItem('user');
-      
-      if (token && userData) {
-        setUser(JSON.parse(userData));
-        setIsAuthenticated(true);
+      // Verificar se é um usuário válido
+      const foundUser = PREDEFINED_USERS.find(
+        u => u.email === email && u.password === password
+      );
+
+      if (foundUser) {
+        const userWithoutPassword = {
+          id: foundUser.id,
+          email: foundUser.email,
+          name: foundUser.name,
+          role: foundUser.role
+        };
+        
+        setUser(userWithoutPassword);
+        SessionManager.saveSession(userWithoutPassword);
+        console.log('AuthContext: Usuário logado com sucesso:', userWithoutPassword);
+        
+        return { success: true, user: userWithoutPassword };
+      } else {
+        return { success: false, error: 'Credenciais inválidas' };
       }
     } catch (error) {
-      console.error('Erro ao verificar autenticação:', error);
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      return { success: false, error: error.message };
     } finally {
       setLoading(false);
     }
   };
 
-  const login = async (email, password) => {
-    try {
-      const response = await apiService.login(email, password);
-      
-      if (response.token && response.user) {
-        localStorage.setItem('token', response.token);
-        localStorage.setItem('user', JSON.stringify(response.user));
-        setUser(response.user);
-        setIsAuthenticated(true);
-        return { success: true, user: response.user };
-      }
-      
-      throw new Error('Resposta inválida do servidor');
-    } catch (error) {
-      console.error('Erro no login:', error);
-      return { success: false, error: error.message };
-    }
-  };
-
-  const register = async (userData) => {
-    try {
-      const response = await apiService.register(userData);
-      
-      if (response.token && response.user) {
-        localStorage.setItem('token', response.token);
-        localStorage.setItem('user', JSON.stringify(response.user));
-        setUser(response.user);
-        setIsAuthenticated(true);
-        return { success: true, user: response.user };
-      }
-      
-      throw new Error('Resposta inválida do servidor');
-    } catch (error) {
-      console.error('Erro no registro:', error);
-      return { success: false, error: error.message };
-    }
-  };
-
   const logout = () => {
-    apiService.logout();
+    console.log('AuthContext: Fazendo logout');
     setUser(null);
-    setIsAuthenticated(false);
+    SessionManager.clearSession();
   };
 
   const isAdmin = () => {
-    return user && user.role === 'admin';
+    return user?.role === 'admin';
   };
 
   const value = {
     user,
-    loading,
-    isAuthenticated,
     login,
-    register,
     logout,
-    isAdmin,
+    loading,
+    isAuthenticated: !!user,
+    isAdmin
   };
 
   return (
@@ -102,5 +105,3 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-
-export default AuthContext;

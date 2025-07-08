@@ -11,18 +11,19 @@ import {
   EnvelopeIcon,
   TruckIcon,
   TagIcon,
+  CogIcon,
 } from "@heroicons/react/24/outline";
 import Logo from "../common/Logo";
 import CartSidebar from "../common/CartSidebar";
 import { useCart } from "../../contexts/CartContext";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../../hooks/useAuth";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isCartOpen, setIsCartOpen] = useState(false);
   const { getCartItemsCount } = useCart();
-  const { user, isAuthenticated, logout, isAdmin } = useAuth();
+  const { user, logout, isAuthenticated, isAdmin } = useAuth();
 
   const categories = [
     { name: "Proteínas", path: "/proteinas" },
@@ -140,13 +141,40 @@ const Header = () => {
                   <button className="p-3 rounded-xl bg-gray-100 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 flex items-center space-x-2">
                     <UserIcon className="w-6 h-6" />
                     <span className="hidden lg:inline font-semibold">
-                      {isAuthenticated ? user?.name?.split(' ')[0] : 'Conta'}
+                      {isAuthenticated ? user?.name || 'Conta' : 'Conta'}
                     </span>
                   </button>
                   <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-2xl shadow-2xl border-2 border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-40">
                     <div className="py-3">
-                      {isAuthenticated ? (
+                      {!isAuthenticated ? (
                         <>
+                          <Link
+                            to="/login"
+                            className="block px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-600 rounded-xl mx-2 transition-all duration-200 font-medium"
+                          >
+                            Fazer Login
+                          </Link>
+                          <Link
+                            to="/cadastro"
+                            className="block px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-600 rounded-xl mx-2 transition-all duration-200 font-medium"
+                          >
+                            Criar Conta
+                          </Link>
+                        </>
+                      ) : (
+                        <>
+                          {isAdmin() && (
+                            <>
+                              <Link
+                                to="/admin"
+                                className="flex items-center space-x-2 px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-indigo-50 hover:text-purple-600 rounded-xl mx-2 transition-all duration-200 font-medium"
+                              >
+                                <CogIcon className="w-4 h-4" />
+                                <span>Painel Admin</span>
+                              </Link>
+                              <hr className="my-2 mx-4" />
+                            </>
+                          )}
                           <Link
                             to="/minha-conta"
                             className="block px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-600 rounded-xl mx-2 transition-all duration-200 font-medium"
@@ -154,7 +182,7 @@ const Header = () => {
                             Minha Conta
                           </Link>
                           <Link
-                            to="/meus-pedidos"
+                            to="/pedidos"
                             className="block px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-600 rounded-xl mx-2 transition-all duration-200 font-medium"
                           >
                             Meus Pedidos
@@ -165,14 +193,6 @@ const Header = () => {
                           >
                             Favoritos
                           </Link>
-                          {isAdmin() && (
-                            <Link
-                              to="/admin"
-                              className="block px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 hover:text-green-600 rounded-xl mx-2 transition-all duration-200 font-medium"
-                            >
-                              Admin Panel
-                            </Link>
-                          )}
                           <hr className="my-2 mx-4" />
                           <button
                             onClick={logout}
@@ -180,21 +200,6 @@ const Header = () => {
                           >
                             Sair
                           </button>
-                        </>
-                      ) : (
-                        <>
-                          <Link
-                            to="/login"
-                            className="block px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-600 rounded-xl mx-2 transition-all duration-200 font-medium"
-                          >
-                            Entrar
-                          </Link>
-                          <Link
-                            to="/login"
-                            className="block px-4 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 hover:text-green-600 rounded-xl mx-2 transition-all duration-200 font-medium"
-                          >
-                            Criar Conta
-                          </Link>
                         </>
                       )}
                     </div>
@@ -349,7 +354,6 @@ const Header = () => {
                 <Link
                   key={category.name}
                   to={category.path}
-                  onClick={() => setIsMenuOpen(false)}
                   className="group block px-6 py-4 text-gray-800 hover:text-blue-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 rounded-2xl transition-all duration-300 font-bold text-lg border-2 border-transparent hover:border-blue-200/50 transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20"
                   style={{
                     animationDelay: `${index * 0.1}s`,
@@ -378,29 +382,71 @@ const Header = () => {
               {/* User links premium */}
               <div className="mt-8 pt-6 border-t-2 border-gray-100 space-y-3">
                 <h4 className="text-xs font-black uppercase tracking-widest text-gray-600 mb-4 px-2">
-                  Minha Conta
+                  {isAuthenticated ? `Olá, ${user?.name}` : 'Minha Conta'}
                 </h4>
-                <a
-                  href="#"
-                  className="flex items-center space-x-3 px-6 py-4 text-gray-700 hover:text-blue-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 rounded-2xl transition-all duration-300 font-semibold border-2 border-transparent hover:border-blue-200/50"
-                >
-                  <span className="text-xl">👤</span>
-                  <span>Minha Conta</span>
-                </a>
-                <a
-                  href="#"
+                
+                {!isAuthenticated ? (
+                  <>
+                    <Link
+                      to="/login"
+                      className="flex items-center space-x-3 px-6 py-4 text-gray-700 hover:text-blue-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 rounded-2xl transition-all duration-300 font-semibold border-2 border-transparent hover:border-blue-200/50"
+                    >
+                      <span className="text-xl">👤</span>
+                      <span>Fazer Login</span>
+                    </Link>
+                    <Link
+                      to="/cadastro"
+                      className="flex items-center space-x-3 px-6 py-4 text-gray-700 hover:text-green-600 hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 rounded-2xl transition-all duration-300 font-semibold border-2 border-transparent hover:border-green-200/50"
+                    >
+                      <span className="text-xl">✨</span>
+                      <span>Criar Conta</span>
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    {isAdmin() && (
+                      <Link
+                        to="/admin"
+                        className="flex items-center space-x-3 px-6 py-4 text-gray-700 hover:text-purple-600 hover:bg-gradient-to-r hover:from-purple-50 hover:to-indigo-50 rounded-2xl transition-all duration-300 font-semibold border-2 border-transparent hover:border-purple-200/50"
+                      >
+                        <span className="text-xl">⚙️</span>
+                        <span>Painel Admin</span>
+                      </Link>
+                    )}
+                    <Link
+                      to="/minha-conta"
+                      className="flex items-center space-x-3 px-6 py-4 text-gray-700 hover:text-blue-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 rounded-2xl transition-all duration-300 font-semibold border-2 border-transparent hover:border-blue-200/50"
+                    >
+                      <span className="text-xl">👤</span>
+                      <span>Minha Conta</span>
+                    </Link>
+                    <Link
+                      to="/pedidos"
+                      className="flex items-center space-x-3 px-6 py-4 text-gray-700 hover:text-green-600 hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 rounded-2xl transition-all duration-300 font-semibold border-2 border-transparent hover:border-green-200/50"
+                    >
+                      <span className="text-xl">📦</span>
+                      <span>Meus Pedidos</span>
+                    </Link>
+                  </>
+                )}
+                
+                <Link
+                  to="/favoritos"
                   className="flex items-center space-x-3 px-6 py-4 text-gray-700 hover:text-red-600 hover:bg-gradient-to-r hover:from-red-50 hover:to-pink-50 rounded-2xl transition-all duration-300 font-semibold border-2 border-transparent hover:border-red-200/50"
                 >
                   <span className="text-xl">❤️</span>
                   <span>Favoritos</span>
-                </a>
-                <a
-                  href="#"
-                  className="flex items-center space-x-3 px-6 py-4 text-gray-700 hover:text-purple-600 hover:bg-gradient-to-r hover:from-purple-50 hover:to-indigo-50 rounded-2xl transition-all duration-300 font-semibold border-2 border-transparent hover:border-purple-200/50"
-                >
-                  <span className="text-xl">📋</span>
-                  <span>Meus Pedidos</span>
-                </a>
+                </Link>
+                
+                {isAuthenticated && (
+                  <button
+                    onClick={logout}
+                    className="flex items-center space-x-3 px-6 py-4 text-gray-700 hover:text-red-600 hover:bg-gradient-to-r hover:from-red-50 hover:to-pink-50 rounded-2xl transition-all duration-300 font-semibold border-2 border-transparent hover:border-red-200/50 w-full text-left"
+                  >
+                    <span className="text-xl">🚪</span>
+                    <span>Sair</span>
+                  </button>
+                )}
               </div>
             </nav>
           </div>

@@ -1,216 +1,153 @@
-import { useState, useEffect } from 'react';
-import apiService from '../services/api';
+import { useState, useEffect, useCallback } from 'react';
+import sampleProducts from '../data/sampleProducts';
 
-export const useProducts = (filters = {}) => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+export const useProducts = () => {
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  useEffect(() => {
-    fetchProducts();
-  }, [filters]);
+    const loadProducts = useCallback(() => {
+        // Carregar produtos de exemplo e produtos criados pelo admin
+        const adminProducts = JSON.parse(localStorage.getItem('adminProducts') || '[]');
+        const savedProducts = JSON.parse(localStorage.getItem('products') || '[]');
+        
+        // Começar com produtos de exemplo
+        const allProducts = [...sampleProducts];
+        
+        // Primeiro, aplicar produtos salvos (substituindo ou adicionando)
+        savedProducts.forEach(savedProduct => {
+            // Validar e normalizar produto salvo
+            const normalizedProduct = {
+                ...savedProduct,
+                price: typeof savedProduct.price === 'string' ? parseFloat(savedProduct.price) : savedProduct.price,
+                originalPrice: savedProduct.originalPrice ? 
+                    (typeof savedProduct.originalPrice === 'string' ? parseFloat(savedProduct.originalPrice) : savedProduct.originalPrice) 
+                    : null,
+                images: savedProduct.images || [savedProduct.image].filter(Boolean) || [],
+                isNew: Boolean(savedProduct.isNew),
+                isFeatured: Boolean(savedProduct.isFeatured)
+            };
+            
+            const existingIndex = allProducts.findIndex(p => p.id === savedProduct.id);
+            if (existingIndex >= 0) {
+                // Substituir com versão salva
+                allProducts[existingIndex] = normalizedProduct;
+            } else {
+                // Adicionar novo produto salvo
+                allProducts.push(normalizedProduct);
+            }
+        });
+        
+        // Depois, aplicar produtos do admin (têm prioridade máxima)
+        adminProducts.forEach(adminProduct => {
+            // Validar e normalizar produto admin
+            const normalizedProduct = {
+                ...adminProduct,
+                price: typeof adminProduct.price === 'string' ? parseFloat(adminProduct.price) : adminProduct.price,
+                originalPrice: adminProduct.originalPrice ? 
+                    (typeof adminProduct.originalPrice === 'string' ? parseFloat(adminProduct.originalPrice) : adminProduct.originalPrice) 
+                    : null,
+                images: adminProduct.images || [adminProduct.image].filter(Boolean) || [],
+                isNew: Boolean(adminProduct.isNew),
+                isFeatured: Boolean(adminProduct.isFeatured)
+            };
+            
+            const existingIndex = allProducts.findIndex(p => p.id === adminProduct.id);
+            if (existingIndex >= 0) {
+                // Substituir produto existente com versão editada pelo admin
+                allProducts[existingIndex] = normalizedProduct;
+            } else {
+                // Adicionar novo produto criado pelo admin
+                allProducts.push(normalizedProduct);
+            }
+        });
+        
+        setProducts(allProducts);
+        setLoading(false);
+        setError(null);
+    }, []);
 
-  const fetchProducts = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await apiService.getProducts(filters);
-      setProducts(response.products || []);
-    } catch (error) {
-      console.error('Erro ao buscar produtos:', error);
-      setError(error.message);
-      // Fallback para produtos estáticos em caso de erro
-      setProducts(getStaticProducts());
-    } finally {
-      setLoading(false);
-    }
-  };
+    const refreshProducts = useCallback(() => {
+        setRefreshTrigger(prev => prev + 1);
+    }, []);
 
-  const getStaticProducts = () => {
-    return [
-      {
-        id: 1,
-        name: "Whey Protein Concentrado 900g",
-        price: 89.90,
-        originalPrice: 129.90,
-        image: "/creatina.webp",
-        rating: 4.8,
-        reviews: 245,
-        brand: "Integralmédica",
-        category: "Proteínas",
-        isNew: true,
-        isBestSeller: false,
-        description: "Proteína de alta qualidade para ganho de massa muscular",
-        stock: 15,
-        weight: "900g",
-        flavor: "Chocolate"
-      },
-      {
-        id: 2,
-        name: "Creatina Monohidratada 300g",
-        price: 45.90,
-        originalPrice: 65.90,
-        image: "/creatina.webp",
-        rating: 4.9,
-        reviews: 189,
-        brand: "Growth",
-        category: "Creatina",
-        isNew: false,
-        isBestSeller: true,
-        description: "Creatina pura para aumento de força e resistência",
-        stock: 8,
-        weight: "300g",
-        flavor: "Sem sabor"
-      },
-      {
-        id: 3,
-        name: "Pré-Treino Vaso-X 300g",
-        price: 79.90,
-        originalPrice: 99.90,
-        image: "/black-skull.webp",
-        rating: 4.7,
-        reviews: 156,
-        brand: "Black Skull",
-        category: "Pré-Treino",
-        isNew: true,
-        isBestSeller: true,
-        description: "Pré-treino com fórmula avançada para máxima performance",
-        stock: 12,
-        weight: "300g",
-        flavor: "Frutas Vermelhas"
-      },
-      {
-        id: 4,
-        name: "Multivitamínico Premium 60 caps",
-        price: 35.90,
-        originalPrice: 49.90,
-        image: "/probiotica.jpg",
-        rating: 4.6,
-        reviews: 98,
-        brand: "Probiótica",
-        category: "Vitaminas",
-        isNew: false,
-        isBestSeller: false,
-        description: "Complexo vitamínico completo para saúde e bem-estar",
-        stock: 20,
-        weight: "60 cápsulas",
-        flavor: "Sem sabor"
-      }
-    ];
-  };
+    useEffect(() => {
+        loadProducts();
+    }, [loadProducts, refreshTrigger]);
 
-  const refetch = () => {
-    fetchProducts();
-  };
-
-  return { products, loading, error, refetch };
+    return { products, loading, error, refreshProducts };
 };
 
 export const useProduct = (id) => {
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+    const [product, setProduct] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-  useEffect(() => {
-    if (id) {
-      fetchProduct();
-    }
-  }, [id]);
+    useEffect(() => {
+        if (!id) return;
 
-  const fetchProduct = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await apiService.getProductById(id);
-      setProduct(response.product || null);
-    } catch (error) {
-      console.error('Erro ao buscar produto:', error);
-      setError(error.message);
-      // Fallback para produto estático
-      const staticProducts = getStaticProducts();
-      const staticProduct = staticProducts.find(p => p.id === parseInt(id));
-      setProduct(staticProduct || null);
-    } finally {
-      setLoading(false);
-    }
-  };
+        // Carregar todos os produtos com a mesma prioridade do hook principal
+        const adminProducts = JSON.parse(localStorage.getItem('adminProducts') || '[]');
+        const savedProducts = JSON.parse(localStorage.getItem('products') || '[]');
+        
+        const allProducts = [...sampleProducts];
+        
+        // Aplicar produtos salvos primeiro
+        savedProducts.forEach(savedProduct => {
+            const normalizedProduct = {
+                ...savedProduct,
+                price: typeof savedProduct.price === 'string' ? parseFloat(savedProduct.price) : savedProduct.price,
+                originalPrice: savedProduct.originalPrice ? 
+                    (typeof savedProduct.originalPrice === 'string' ? parseFloat(savedProduct.originalPrice) : savedProduct.originalPrice) 
+                    : null,
+                images: savedProduct.images || [savedProduct.image].filter(Boolean) || [],
+                isNew: Boolean(savedProduct.isNew),
+                isFeatured: Boolean(savedProduct.isFeatured)
+            };
+            
+            const existingIndex = allProducts.findIndex(p => p.id === savedProduct.id);
+            if (existingIndex >= 0) {
+                allProducts[existingIndex] = normalizedProduct;
+            } else {
+                allProducts.push(normalizedProduct);
+            }
+        });
+        
+        // Aplicar produtos do admin por último (prioridade máxima)
+        adminProducts.forEach(adminProduct => {
+            const normalizedProduct = {
+                ...adminProduct,
+                price: typeof adminProduct.price === 'string' ? parseFloat(adminProduct.price) : adminProduct.price,
+                originalPrice: adminProduct.originalPrice ? 
+                    (typeof adminProduct.originalPrice === 'string' ? parseFloat(adminProduct.originalPrice) : adminProduct.originalPrice) 
+                    : null,
+                images: adminProduct.images || [adminProduct.image].filter(Boolean) || [],
+                isNew: Boolean(adminProduct.isNew),
+                isFeatured: Boolean(adminProduct.isFeatured)
+            };
+            
+            const existingIndex = allProducts.findIndex(p => p.id === adminProduct.id);
+            if (existingIndex >= 0) {
+                allProducts[existingIndex] = normalizedProduct;
+            } else {
+                allProducts.push(normalizedProduct);
+            }
+        });
 
-  const getStaticProducts = () => {
-    return [
-      {
-        id: 1,
-        name: "Whey Protein Concentrado 900g",
-        price: 89.90,
-        originalPrice: 129.90,
-        image: "/creatina.webp",
-        rating: 4.8,
-        reviews: 245,
-        brand: "Integralmédica",
-        category: "Proteínas",
-        isNew: true,
-        isBestSeller: false,
-        description: "Proteína de alta qualidade para ganho de massa muscular",
-        stock: 15,
-        weight: "900g",
-        flavor: "Chocolate"
-      },
-      {
-        id: 2,
-        name: "Creatina Monohidratada 300g",
-        price: 45.90,
-        originalPrice: 65.90,
-        image: "/creatina.webp",
-        rating: 4.9,
-        reviews: 189,
-        brand: "Growth",
-        category: "Creatina",
-        isNew: false,
-        isBestSeller: true,
-        description: "Creatina pura para aumento de força e resistência",
-        stock: 8,
-        weight: "300g",
-        flavor: "Sem sabor"
-      },
-      {
-        id: 3,
-        name: "Pré-Treino Vaso-X 300g",
-        price: 79.90,
-        originalPrice: 99.90,
-        image: "/black-skull.webp",
-        rating: 4.7,
-        reviews: 156,
-        brand: "Black Skull",
-        category: "Pré-Treino",
-        isNew: true,
-        isBestSeller: true,
-        description: "Pré-treino com fórmula avançada para máxima performance",
-        stock: 12,
-        weight: "300g",
-        flavor: "Frutas Vermelhas"
-      },
-      {
-        id: 4,
-        name: "Multivitamínico Premium 60 caps",
-        price: 35.90,
-        originalPrice: 49.90,
-        image: "/probiotica.jpg",
-        rating: 4.6,
-        reviews: 98,
-        brand: "Probiótica",
-        category: "Vitaminas",
-        isNew: false,
-        isBestSeller: false,
-        description: "Complexo vitamínico completo para saúde e bem-estar",
-        stock: 20,
-        weight: "60 cápsulas",
-        flavor: "Sem sabor"
-      }
-    ];
-  };
+        // Buscar produto
+        const foundProduct = allProducts.find(p => p.id === parseInt(id));
+        
+        if (foundProduct) {
+            setProduct(foundProduct);
+        } else {
+            setError('Produto não encontrado');
+        }
+        
+        setLoading(false);
+    }, [id]);
 
-  const refetch = () => {
-    fetchProduct();
-  };
-
-  return { product, loading, error, refetch };
+    return { product, loading, error };
 };
+
+export default useProducts;

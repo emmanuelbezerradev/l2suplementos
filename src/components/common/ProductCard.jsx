@@ -1,113 +1,231 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { FiShoppingCart, FiHeart, FiStar } from 'react-icons/fi';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  HeartIcon,
+  ShoppingCartIcon,
+  EyeIcon,
+  StarIcon,
+} from "@heroicons/react/24/outline";
+import { HeartIcon as HeartIconSolid } from "@heroicons/react/24/solid";
 
-const ProductCard = ({ product }) => {
-  const {
-    id,
-    name,
-    price,
-    originalPrice,
-    image,
-    rating,
-    reviews,
-    brand,
-    isNew,
-    isBestSeller
-  } = product;
+const ProductCard = ({
+  product,
+  onQuickView,
+  onAddToCart,
+  onToggleFavorite,
+}) => {
+  const navigate = useNavigate();
+  const [isHovered, setIsHovered] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(product.isFavorite || false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const discountPercentage = originalPrice ? Math.round(((originalPrice - price) / originalPrice) * 100) : 0;
+  // Usar múltiplas imagens se disponível, senão usar imagem única
+  const images = product.images && product.images.length > 0 
+    ? product.images 
+    : [product.image];
+
+  const currentImage = images[currentImageIndex];
+  const hasMultipleImages = images.length > 1;
+
+  const handleToggleFavorite = () => {
+    setIsFavorite(!isFavorite);
+    onToggleFavorite && onToggleFavorite(product.id);
+  };
+
+  const handleAddToCart = () => {
+    onAddToCart && onAddToCart(product);
+  };
+
+  const handleQuickView = () => {
+    onQuickView && onQuickView(product);
+  };
+
+  const handleProductClick = () => {
+    navigate(`/produto/${product.id}`);
+  };
+
+  const calculateDiscount = () => {
+    if (product.originalPrice && product.price) {
+      return Math.round(
+        ((product.originalPrice - product.price) / product.originalPrice) * 100
+      );
+    }
+    return 0;
+  };
+
+  const discountPercentage = calculateDiscount();
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:rotate-1 group overflow-hidden animate-glow">
-      {/* Product Image */}
-      <div className="relative overflow-hidden">
-        <Link to={`/produto/${id}`}>
-          <img
-            src={image}
-            alt={name}
-            className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-700 filter group-hover:brightness-110"
-          />
-        </Link>
-        
-        {/* Efeito de brilho */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-shimmer"></div>
-        
-        {/* Badges */}
-        <div className="absolute top-4 left-4 flex flex-col gap-2">
-          {isNew && (
-            <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-              NOVO
-            </span>
-          )}
-          {isBestSeller && (
-            <span className="bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-              BEST SELLER
-            </span>
-          )}
-          {discountPercentage > 0 && (
-            <span className="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-              -{discountPercentage}%
-            </span>
-          )}
+    <div
+      className="card group relative overflow-hidden"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Badge de desconto */}
+      {discountPercentage > 0 && (
+        <div className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold z-10">
+          -{discountPercentage}%
         </div>
+      )}
 
-        {/* Quick Actions */}
-        <div className="absolute top-4 right-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all duration-500 transform group-hover:scale-110">
-          <button className="bg-white p-2 rounded-full shadow-lg hover:bg-red-50 hover:text-red-500 transition-all duration-300 transform hover:scale-110 animate-breathe">
-            <FiHeart className="w-5 h-5" />
+      {/* Badge de novo produto */}
+      {product.isNew && (
+        <div className="absolute top-3 right-3 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold z-10">
+          NOVO
+        </div>
+      )}
+
+      {/* Imagem do produto */}
+      <div className="relative overflow-hidden cursor-pointer" onClick={handleProductClick}>
+        <img
+          src={currentImage || "/api/placeholder/280/280"}
+          alt={product.name}
+          className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105"
+        />
+
+        {/* Indicadores de Múltiplas Imagens */}
+        {hasMultipleImages && (
+          <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex gap-1">
+            {images.map((_, index) => (
+              <button
+                key={index}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCurrentImageIndex(index);
+                }}
+                className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                  index === currentImageIndex
+                    ? 'bg-white scale-125'
+                    : 'bg-white/60 hover:bg-white/80'
+                }`}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Overlay com ações */}
+        <div
+          className={`absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center space-x-2 transition-opacity duration-300 ${
+            isHovered ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          <button
+            onClick={handleQuickView}
+            className="bg-white text-gray-800 p-2 rounded-full hover:bg-primary-500 hover:text-white transition-colors"
+            title="Visualização rápida"
+          >
+            <EyeIcon className="w-5 h-5" />
+          </button>
+
+          <button
+            onClick={handleToggleFavorite}
+            className="bg-white text-gray-800 p-2 rounded-full hover:bg-red-500 hover:text-white transition-colors"
+            title={
+              isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"
+            }
+          >
+            {isFavorite ? (
+              <HeartIconSolid className="w-5 h-5 text-red-500" />
+            ) : (
+              <HeartIcon className="w-5 h-5" />
+            )}
+          </button>
+
+          <button
+            onClick={handleAddToCart}
+            className="bg-primary-500 text-white p-2 rounded-full hover:bg-primary-600 transition-colors"
+            title="Adicionar ao carrinho"
+          >
+            <ShoppingCartIcon className="w-5 h-5" />
           </button>
         </div>
       </div>
 
-      {/* Product Info */}
-      <div className="p-6">
-        {/* Brand */}
-        {brand && (
-          <p className="text-sm text-gray-500 mb-2">{brand}</p>
+      {/* Informações do produto */}
+      <div className="p-4">
+        {/* Marca */}
+        {product.brand && (
+          <p className="text-sm text-gray-500 mb-1">{product.brand}</p>
         )}
 
-        {/* Product Name */}
-        <Link to={`/produto/${id}`}>
-          <h3 className="text-lg font-bold text-gray-800 mb-3 hover:text-blue-600 transition-colors line-clamp-2">
-            {name}
-          </h3>
-        </Link>
+        {/* Nome do produto */}
+        <h3 
+          className="font-semibold text-gray-800 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors cursor-pointer"
+          onClick={handleProductClick}
+        >
+          {product.name}
+        </h3>
 
-        {/* Rating */}
-        {rating && (
-          <div className="flex items-center gap-2 mb-3">
-            <div className="flex items-center gap-1">
-              {[...Array(5)].map((_, i) => (
-                <FiStar
-                  key={i}
-                  className={`w-4 h-4 ${
-                    i < Math.floor(rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'
-                  }`}
-                />
-              ))}
-            </div>
-            <span className="text-sm text-gray-500">({reviews} avaliações)</span>
+        {/* Avaliação */}
+        <div className="flex items-center mb-2">
+          <div className="flex items-center">
+            {[...Array(5)].map((_, i) => (
+              <StarIcon
+                key={i}
+                className={`w-4 h-4 ${
+                  i < Math.floor(product.rating || 0)
+                    ? "text-yellow-400 fill-current"
+                    : "text-gray-300"
+                }`}
+              />
+            ))}
           </div>
-        )}
-
-        {/* Price */}
-        <div className="flex items-center gap-2 mb-4">
-          <span className="text-2xl font-bold text-blue-600">
-            R$ {price.toFixed(2).replace('.', ',')}
+          <span className="text-sm text-gray-500 ml-1">
+            ({product.reviews || 0})
           </span>
-          {originalPrice && originalPrice > price && (
-            <span className="text-sm text-gray-500 line-through">
-              R$ {originalPrice.toFixed(2).replace('.', ',')}
-            </span>
+        </div>
+
+        {/* Preços */}
+        <div className="mb-3">
+          {product.originalPrice && product.originalPrice !== product.price && (
+            <p className="text-sm text-gray-400 line-through">
+              R$ {product.originalPrice.toFixed(2).replace(".", ",")}
+            </p>
+          )}
+          <p className="text-xl font-bold text-primary-600">
+            R$ {product.price.toFixed(2).replace(".", ",")}
+          </p>
+          {product.installments && (
+            <p className="text-sm text-gray-500">
+              ou {product.installments}x de R${" "}
+              {(product.price / product.installments)
+                .toFixed(2)
+                .replace(".", ",")}
+            </p>
           )}
         </div>
 
-        {/* Add to Cart Button */}
-        <button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-3 px-6 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-500 transform hover:scale-105 hover:shadow-xl flex items-center justify-center gap-2 group animate-glow">
-          <FiShoppingCart className="w-5 h-5 group-hover:animate-bounce" />
-          <span className="animate-shimmer">ADICIONAR AO CARRINHO</span>
+        {/* Botão de adicionar ao carrinho */}
+        <button
+          onClick={handleAddToCart}
+          className="w-full btn-primary text-sm py-2 group-hover:bg-primary-600"
+        >
+          Adicionar ao Carrinho
         </button>
+
+        {/* Informações extras */}
+        {product.freeShipping && (
+          <p className="text-green-600 text-xs mt-2 flex items-center">
+            <span className="mr-1">🚚</span>
+            Frete grátis
+          </p>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Componente de skeleton para loading
+export const ProductCardSkeleton = () => {
+  return (
+    <div className="card animate-pulse">
+      <div className="bg-gray-300 h-64 w-full"></div>
+      <div className="p-4">
+        <div className="h-4 bg-gray-300 rounded mb-2 w-1/2"></div>
+        <div className="h-6 bg-gray-300 rounded mb-2"></div>
+        <div className="h-4 bg-gray-300 rounded mb-2 w-3/4"></div>
+        <div className="h-6 bg-gray-300 rounded mb-3 w-1/3"></div>
+        <div className="h-10 bg-gray-300 rounded"></div>
       </div>
     </div>
   );

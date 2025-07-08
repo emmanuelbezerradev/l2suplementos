@@ -1,243 +1,183 @@
-import React, { useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { Link, useNavigate } from 'react-router-dom';
-import {
-  HomeIcon,
-  ShoppingBagIcon,
-  UserGroupIcon,
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
+import { 
+  UsersIcon, 
+  ShoppingBagIcon, 
+  CubeIcon, 
   ChartBarIcon,
   CogIcon,
-  ArrowLeftOnRectangleIcon,
-  PlusIcon,
-  EyeIcon,
-  PencilIcon,
-  TrashIcon,
+  ClipboardDocumentListIcon
 } from '@heroicons/react/24/outline';
 
 const AdminDashboard = () => {
-  const { user, logout, isAdmin } = useAuth();
-  const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('overview');
+  const { user } = useAuth();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
+  // Dados simulados do dashboard
+  const stats = [
+    { name: 'Total de Produtos', value: '156', change: '+12%', icon: CubeIcon },
+    { name: 'Usuários Cadastrados', value: '89', change: '+23%', icon: UsersIcon },
+    { name: 'Pedidos Hoje', value: '12', change: '+8%', icon: ShoppingBagIcon },
+    { name: 'Vendas do Mês', value: 'R$ 24.890', change: '+15%', icon: ChartBarIcon },
+  ];
 
-  if (!isAdmin()) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">Acesso Negado</h1>
-          <p className="text-gray-400 mb-6">Você não tem permissão para acessar esta área.</p>
-          <Link
-            to="/"
-            className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg transition-colors"
-          >
-            Voltar ao Site
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  const menuItems = [
-    { id: 'overview', label: 'Visão Geral', icon: HomeIcon },
-    { id: 'products', label: 'Produtos', icon: ShoppingBagIcon },
-    { id: 'users', label: 'Usuários', icon: UserGroupIcon },
-    { id: 'analytics', label: 'Relatórios', icon: ChartBarIcon },
-    { id: 'settings', label: 'Configurações', icon: CogIcon },
+  const quickActions = [
+    { name: 'Gerenciar Produtos', icon: CubeIcon, href: '/admin/produtos', color: 'bg-blue-500' },
+    { name: 'Usuários', icon: UsersIcon, href: '/admin/usuarios', color: 'bg-green-500' },
+    { name: 'Pedidos', icon: ClipboardDocumentListIcon, href: '/admin/pedidos', color: 'bg-yellow-500' },
+    { name: 'Configurações', icon: CogIcon, href: '/admin/configuracoes', color: 'bg-purple-500' },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-900 flex">
-      {/* Sidebar */}
-      <div className="w-64 bg-gray-800 border-r border-gray-700">
-        <div className="p-6">
-          <div className="flex items-center space-x-3 mb-8">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold">L2</span>
-            </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-6">
             <div>
-              <h1 className="text-white font-bold text-lg">Admin Panel</h1>
-              <p className="text-gray-400 text-sm">L2 Suplementos</p>
+              <h1 className="text-2xl font-bold text-gray-900">Painel Administrativo</h1>
+              <p className="text-gray-600">Bem-vindo, {user?.name}!</p>
             </div>
-          </div>
-
-          <nav className="space-y-2">
-            {menuItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-                  activeTab === item.id
-                    ? 'bg-primary-600 text-white'
-                    : 'text-gray-300 hover:bg-gray-700 hover:text-white'
-                }`}
+            <div className="flex items-center space-x-4">
+              <Link
+                to="/"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
               >
-                <item.icon className="w-5 h-5" />
-                <span>{item.label}</span>
-              </button>
-            ))}
-          </nav>
-        </div>
-
-        {/* User Info */}
-        <div className="absolute bottom-0 w-64 p-6 border-t border-gray-700">
-          <div className="flex items-center space-x-3 mb-4">
-            <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-sm font-bold">
-                {user?.name?.charAt(0) || 'A'}
-              </span>
-            </div>
-            <div>
-              <p className="text-white text-sm font-medium">{user?.name}</p>
-              <p className="text-gray-400 text-xs">{user?.email}</p>
+                Ver Site
+              </Link>
             </div>
           </div>
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center space-x-2 px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition-colors"
-          >
-            <ArrowLeftOnRectangleIcon className="w-4 h-4" />
-            <span>Sair</span>
-          </button>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <header className="bg-gray-800 border-b border-gray-700 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-white">
-              {menuItems.find(item => item.id === activeTab)?.label}
-            </h2>
-            <Link
-              to="/"
-              className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors"
-            >
-              <HomeIcon className="w-5 h-5" />
-              <span>Ver Site</span>
-            </Link>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {stats.map((stat) => (
+            <div key={stat.name} className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <stat.icon className="h-8 w-8 text-gray-400" />
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">
+                      {stat.name}
+                    </dt>
+                    <dd className="flex items-baseline">
+                      <div className="text-2xl font-semibold text-gray-900">
+                        {stat.value}
+                      </div>
+                      <div className="ml-2 flex items-baseline text-sm font-semibold text-green-600">
+                        {stat.change}
+                      </div>
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Quick Actions */}
+        <div className="bg-white rounded-lg shadow mb-8">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-medium text-gray-900">Ações Rápidas</h2>
           </div>
-        </header>
+          <div className="p-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {quickActions.map((action) => (
+                <Link
+                  key={action.name}
+                  to={action.href}
+                  className="flex flex-col items-center p-6 border border-gray-300 rounded-lg hover:border-gray-400 transition-colors group"
+                >
+                  <div className={`${action.color} p-3 rounded-full mb-3 group-hover:scale-110 transition-transform`}>
+                    <action.icon className="h-6 w-6 text-white" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-900 text-center">
+                    {action.name}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
 
-        {/* Content */}
-        <main className="flex-1 p-6 overflow-y-auto">
-          {activeTab === 'overview' && <OverviewTab />}
-          {activeTab === 'products' && <ProductsTab />}
-          {activeTab === 'users' && <UsersTab />}
-          {activeTab === 'analytics' && <AnalyticsTab />}
-          {activeTab === 'settings' && <SettingsTab />}
-        </main>
-      </div>
-    </div>
-  );
-};
-
-// Componente da aba Overview
-const OverviewTab = () => {
-  const stats = [
-    { label: 'Total de Produtos', value: '0', color: 'bg-blue-500' },
-    { label: 'Usuários Ativos', value: '0', color: 'bg-green-500' },
-    { label: 'Pedidos Hoje', value: '0', color: 'bg-purple-500' },
-    { label: 'Vendas do Mês', value: 'R$ 0', color: 'bg-orange-500' },
-  ];
-
-  return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
-          <div key={index} className="bg-gray-800 p-6 rounded-lg border border-gray-700">
-            <div className="flex items-center">
-              <div className={`w-3 h-3 rounded-full ${stat.color} mr-3`}></div>
-              <div>
-                <p className="text-gray-400 text-sm">{stat.label}</p>
-                <p className="text-white text-2xl font-bold">{stat.value}</p>
+        {/* Recent Activity */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Recent Orders */}
+          <div className="bg-white rounded-lg shadow">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900">Pedidos Recentes</h3>
+            </div>
+            <div className="p-6">
+              <div className="space-y-4">
+                {[1, 2, 3, 4].map((order) => (
+                  <div key={order} className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">
+                        Pedido #{order}234
+                      </p>
+                      <p className="text-sm text-gray-500">João Silva</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-medium text-gray-900">R$ 159,90</p>
+                      <p className="text-sm text-green-600">Confirmado</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-6">
+                <Link
+                  to="/admin/pedidos"
+                  className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                >
+                  Ver todos os pedidos →
+                </Link>
               </div>
             </div>
           </div>
-        ))}
-      </div>
 
-      <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
-        <h3 className="text-white text-lg font-semibold mb-4">Ações Rápidas</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button className="bg-primary-600 hover:bg-primary-700 text-white p-4 rounded-lg transition-colors flex items-center space-x-2">
-            <PlusIcon className="w-5 h-5" />
-            <span>Novo Produto</span>
-          </button>
-          <button className="bg-green-600 hover:bg-green-700 text-white p-4 rounded-lg transition-colors flex items-center space-x-2">
-            <EyeIcon className="w-5 h-5" />
-            <span>Ver Pedidos</span>
-          </button>
-          <button className="bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-lg transition-colors flex items-center space-x-2">
-            <ChartBarIcon className="w-5 h-5" />
-            <span>Relatórios</span>
-          </button>
+          {/* Top Products */}
+          <div className="bg-white rounded-lg shadow">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900">Produtos Mais Vendidos</h3>
+            </div>
+            <div className="p-6">
+              <div className="space-y-4">
+                {[
+                  { name: 'Whey Protein', sales: 45 },
+                  { name: 'Creatina', sales: 32 },
+                  { name: 'BCAA', sales: 28 },
+                  { name: 'Pré-treino', sales: 24 }
+                ].map((product, index) => (
+                  <div key={product.name} className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <span className="text-sm font-medium text-gray-500 w-6">
+                        {index + 1}.
+                      </span>
+                      <span className="text-sm font-medium text-gray-900 ml-2">
+                        {product.name}
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-500">{product.sales} vendas</span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-6">
+                <Link
+                  to="/admin/relatorios"
+                  className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                >
+                  Ver relatório completo →
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  );
-};
-
-// Componente da aba Products
-const ProductsTab = () => {
-  return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h3 className="text-white text-lg font-semibold">Gerenciar Produtos</h3>
-        <Link
-          to="/admin/products/new"
-          className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2"
-        >
-          <PlusIcon className="w-5 h-5" />
-          <span>Novo Produto</span>
-        </Link>
-      </div>
-
-      <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
-        <p className="text-gray-400 text-center py-8">
-          Nenhum produto cadastrado ainda. Clique em "Novo Produto" para começar.
-        </p>
-      </div>
-    </div>
-  );
-};
-
-// Componente da aba Users
-const UsersTab = () => {
-  return (
-    <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
-      <h3 className="text-white text-lg font-semibold mb-4">Usuários Registrados</h3>
-      <p className="text-gray-400 text-center py-8">
-        Nenhum usuário registrado ainda.
-      </p>
-    </div>
-  );
-};
-
-// Componente da aba Analytics
-const AnalyticsTab = () => {
-  return (
-    <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
-      <h3 className="text-white text-lg font-semibold mb-4">Relatórios e Análises</h3>
-      <p className="text-gray-400 text-center py-8">
-        Funcionalidade em desenvolvimento.
-      </p>
-    </div>
-  );
-};
-
-// Componente da aba Settings
-const SettingsTab = () => {
-  return (
-    <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
-      <h3 className="text-white text-lg font-semibold mb-4">Configurações do Sistema</h3>
-      <p className="text-gray-400 text-center py-8">
-        Funcionalidade em desenvolvimento.
-      </p>
     </div>
   );
 };

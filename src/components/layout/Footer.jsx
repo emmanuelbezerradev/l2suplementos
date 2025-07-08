@@ -317,21 +317,10 @@ const Footer = () => {
                 </span>
                 . Todos os direitos reservados.
               </p>
-              <p className="text-gray-500 text-xs mt-1 flex items-center justify-center md:justify-start">
-                Desenvolvido por{" "}
-                <img 
-                  src="/favicon-32x32.png" 
-                  alt="EB Logo" 
-                  className="w-4 h-4 mx-1 rounded-sm"
-                />
-                <a 
-                  href="https://www.instagram.com/emmanuelbezerra_/" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-primary-400 hover:text-primary-300 transition-colors duration-300 font-medium"
-                >
-                  Emmanuel Bezerra
-                </a>
+              <p className="text-gray-500 text-xs mt-1">
+                Desenvolvido com{" "}
+                <HeartIcon className="w-3 h-3 inline text-red-500" /> por
+                Emmanuel Bezerra
               </p>
             </div>
 

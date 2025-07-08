@@ -15,7 +15,8 @@ export const products = [
         installments: 3,
         description: "Proteína de alta qualidade para o ganho de massa muscular",
         features: ["25g de proteína por dose", "Baixo teor de carboidratos", "Sabor chocolate cremoso"],
-        stock: 50
+        stock: 50,
+        servings: 30
     },
     {
         id: 2,
@@ -33,7 +34,8 @@ export const products = [
         installments: 2,
         description: "Creatina pura para aumento de força e resistência",
         features: ["100% pura", "Melhora performance", "Sem aditivos"],
-        stock: 35
+        stock: 35,
+        servings: 60
     },
     {
         id: 3,
@@ -51,7 +53,8 @@ export const products = [
         installments: 3,
         description: "Energia e foco máximo para seus treinos",
         features: ["200mg de cafeína", "Beta-alanina", "Citrulina malato"],
-        stock: 28
+        stock: 28,
+        servings: 30
     },
     {
         id: 4,
@@ -69,7 +72,8 @@ export const products = [
         installments: 2,
         description: "Aminoácidos essenciais para recuperação muscular",
         features: ["Proporção 2:1:1", "120 cápsulas", "Fácil absorção"],
-        stock: 42
+        stock: 42,
+        servings: 120
     },
     {
         id: 5,
@@ -87,7 +91,8 @@ export const products = [
         installments: 6,
         description: "Proteína isolada de máxima pureza",
         features: ["Proteína isolada", "Zero lactose", "Absorção rápida"],
-        stock: 22
+        stock: 22,
+        servings: 30
     },
     {
         id: 6,
@@ -105,7 +110,8 @@ export const products = [
         installments: 1,
         description: "Vitaminas e minerais essenciais",
         features: ["26 vitaminas e minerais", "Dose diária", "Qualidade farmacêutica"],
-        stock: 65
+        stock: 65,
+        servings: 60
     },
     {
         id: 7,
@@ -123,7 +129,8 @@ export const products = [
         installments: 3,
         description: "Acelerador metabólico natural",
         features: ["Termogênico natural", "Acelera metabolismo", "Sem estimulantes"],
-        stock: 18
+        stock: 18,
+        servings: 60
     },
     {
         id: 8,
@@ -141,7 +148,8 @@ export const products = [
         installments: 5,
         description: "Ganho de peso e massa muscular",
         features: ["50g de proteína", "Carboidratos complexos", "Vitaminas e minerais"],
-        stock: 15
+        stock: 15,
+        servings: 20
     }
 ];
 
